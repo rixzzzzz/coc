@@ -1,0 +1,25 @@
+name: Build APK
+on:
+  push:
+    branches: ain, master v4
+      - name: Cache Buildozer global
+        uses: actions/cachev4
+        with:
+          path: .buildozer_global
+          key: buildozer-global-$ hashFiles('buildozer.spec') 
+      - name: Force x86_64 architecture
+        run: 
+          sed -i 's/^android.archs *=.*/android.archs = x86_64/' buildozer.spec
+          grep -nE '^android.archs' buildozer.spec
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-actionv1
+        id: buildozer
+        with:
+          workdir: .
+          command: buildozer android debug
+          buildozer_version: stable
+      - name: Upload APK
+        uses: actions/upload-artifactv4
+        with:
+          name: cocfarmer-x86_64-debug
+          path: $ steps.buildozer.outputs.filename 
