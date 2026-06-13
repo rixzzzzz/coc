@@ -32,11 +32,14 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install --upgrade buildozer "cython==0.29.36"
 
-      # === LE FIX : force x86_64 pour MuMu / LDPlayer ===
-      - name: Force x86_64 architecture
+      # === FIX : x86_64 (MuMu) + NDK 28c / API 36 alignes sur Python 3.14 + numpy 2.3 ===
+      - name: Patch buildozer.spec
         run: |
           sed -i 's/^android\.archs *=.*/android.archs = x86_64/' buildozer.spec
-          grep -nE '^android\.archs' buildozer.spec
+          sed -i 's/^android\.api *=.*/android.api = 36/' buildozer.spec
+          sed -i 's/^android\.ndk *=.*/android.ndk = 28c/' buildozer.spec
+          echo "---- config apres patch ----"
+          grep -nE '^android\.(archs|api|ndk|minapi|ndk_api) ' buildozer.spec
 
       - name: Cache Buildozer SDK/NDK
         uses: actions/cache@v4
