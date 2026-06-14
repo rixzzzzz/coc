@@ -8,7 +8,7 @@ on:
 jobs:
   build-android:
     name: Build COC AutoFarmer (x86_64)
-    runs-on: ubuntu-24.04        # LTS pinne = environnement stable (pas de PPA casse)
+    runs-on: ubuntu-24.04          # LTS stable
 
     steps:
       - name: Checkout
@@ -27,25 +27,26 @@ jobs:
             zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev \
             build-essential ccache libltdl-dev
 
-      - name: Install Buildozer + Cython
+      # === Combo STABLE pour Kivy 2.3.0 : p4a 2024.1.21 = Python 3.11.5 + NDK 25b ===
+      - name: Install Buildozer + Cython (versions verrouillees)
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install --upgrade buildozer "cython==0.29.36"
+          pip install "buildozer==1.5.0" "python-for-android==2024.1.21" "cython==0.29.36"
 
-      # === FIX : x86_64 (MuMu) + NDK 28c / API 36 alignes sur Python 3.14 + numpy 2.3 ===
-      - name: Patch buildozer.spec
+      # === Cible emulateur MuMu : x86_64 / API 33 / NDK 25b ===
+      - name: Patch buildozer.spec (cible emulateur)
         run: |
           sed -i 's/^android\.archs *=.*/android.archs = x86_64/' buildozer.spec
-          sed -i 's/^android\.api *=.*/android.api = 36/' buildozer.spec
-          sed -i 's/^android\.ndk *=.*/android.ndk = 28c/' buildozer.spec
+          sed -i 's/^android\.api *=.*/android.api = 33/' buildozer.spec
+          sed -i 's/^android\.ndk *=.*/android.ndk = 25b/' buildozer.spec
           echo "---- config apres patch ----"
-          grep -nE '^android\.(archs|api|ndk|minapi|ndk_api) ' buildozer.spec
+          grep -nE '^(requirements|android\.(archs|api|ndk|minapi|ndk_api)) ' buildozer.spec
 
       - name: Cache Buildozer SDK/NDK
         uses: actions/cache@v4
         with:
           path: ~/.buildozer
-          key: buildozer-${{ hashFiles('buildozer.spec') }}
+          key: buildozer-py311-ndk25b-${{ hashFiles('buildozer.spec') }}
 
       - name: Build APK (debug)
         env:
