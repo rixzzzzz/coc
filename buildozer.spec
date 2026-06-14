@@ -13,7 +13,7 @@ source.include_exts = py,png,jpg,kv,atlas,json
 version = 1.0.0
 
 # Application requirements
-requirements = python3,kivy==2.3.0,pillow,numpy,pyjnius,android,plyer
+requirements = python3==3.11.5,hostpython3==3.11.5,kivy==2.3.0,pillow,numpy,pyjnius,android,plyer
 
 # Android-specific
 android.permissions = INTERNET,SYSTEM_ALERT_WINDOW,FOREGROUND_SERVICE,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE,RECEIVE_BOOT_COMPLETED,WAKE_LOCK
@@ -24,7 +24,7 @@ android.sdk = 33
 android.ndk = 25b
 
 # Android arch
-android.archs = arm64-v8a,armeabi-v7a
+android.archs = arm64-v8a,x86_64
 
 # Gradle dependencies (OpenCV for image processing)
 android.gradle_dependencies = org.opencv:opencv:4.8.0
